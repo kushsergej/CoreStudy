@@ -16,15 +16,14 @@ namespace CoreStudy
 {
     public class Startup
     {
-        //Properties
+        #region DI
         public IConfiguration Configuration { get; }
 
-
-        //Constructor
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
+        #endregion
 
 
         // This method gets called by the runtime. Use this method to add services to the container.

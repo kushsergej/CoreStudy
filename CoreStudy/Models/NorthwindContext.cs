@@ -1,23 +1,25 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 namespace CoreStudy.Models
 {
     //Connect to existed Northwind database has been made via Reverse Engineering
-    //  1) Run in Package Manager Console a command:
-    //     Scaffold-DbContext "Server=(localdb)\mssqllocaldb; Database=Northwind; Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
-    //  2) 
+    //  Run in Package Manager Console a command:
+    //  Scaffold-DbContext "Server=(localdb)\mssqllocaldb; Database=Northwind; Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
     public partial class NorthwindContext : DbContext
     {
-        #region Constructors
+        #region DI
+        private readonly IConfiguration configuration;
+
         public NorthwindContext()
         {
         }
 
-        public NorthwindContext(DbContextOptions<NorthwindContext> options)
-            : base(options)
+        public NorthwindContext(DbContextOptions<NorthwindContext> options, IConfiguration _configuration): base(options)
         {
+            configuration = _configuration;
         }
         #endregion
 
@@ -45,7 +47,7 @@ namespace CoreStudy.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb; Database=Northwind; Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("NorthwindDatabase"));
             }
         }
         #endregion
