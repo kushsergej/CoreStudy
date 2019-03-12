@@ -45,5 +45,35 @@ namespace CoreStudy.Controllers
 
             return View(await allProducts.ToListAsync());
         }
+
+
+        //GET: Products/Create
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            //Suppliers and Categories should be rendered as dropdown list
+            ViewData["SupplierId"] = new SelectList(await db.Suppliers.ToListAsync(), "SupplierId", "CompanyName");
+            ViewData["CategoryId"] = new SelectList(await db.Categories.ToListAsync(), "CategoryId", "CategoryName");
+            return View();
+        }
+
+
+        //POST: Products/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("ProductName", "SupplierId", "CategoryId", "QuantityPerUnit", "UnitPrice", "UnitsInStock", "UnitsOnOrder", "ReorderLevel", "Discontinued")] Products product)
+        {
+            //if product is valid
+            if (ModelState.IsValid)
+            {
+                await db.AddAsync(product);
+                await db.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewData["SupplierId"] = new SelectList(await db.Suppliers.ToListAsync(), "SupplierId", "CompanyName", product.SupplierId);
+            ViewData["CategoryId"] = new SelectList(await db.Categories.ToListAsync(), "CategoryId", "CategoryName", product.CategoryId);
+            return View(product);
+        }
     }
 }
