@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h2> Categories </h2>
+<h2> Categories List </h2>
 
 <table class="table">
     <thead>
@@ -12,6 +12,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.CategoryName)
             </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
@@ -24,6 +25,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.CategoryName)
                     </td>
+
                     <td>
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
@@ -32,6 +34,7 @@
     </tbody>
 </table>
 
-<p>
-    <a asp-controller="Home" asp-action="Index"> Back to start page </a>
-</p>
+
+<div>
+    <a asp-controller="Home" asp-action="Index"> Back to Start Page </a>
+</div>

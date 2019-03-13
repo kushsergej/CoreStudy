@@ -75,5 +75,73 @@ namespace CoreStudy.Controllers
             ViewData["CategoryId"] = new SelectList(await db.Categories.ToListAsync(), "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
         }
+
+
+        //GET: Products/Edit/1
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Products product = await db.Products.FindAsync(id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["SupplierId"] = new SelectList(await db.Suppliers.ToListAsync(), "SupplierId", "CompanyName", product.SupplierId);
+            ViewData["CategoryId"] = new SelectList(await db.Categories.ToListAsync(), "CategoryId", "CategoryName", product.CategoryId);
+            return View(product);
+        }
+
+
+        //POST: Products/Edit/1
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("ProductId", "ProductName", "SupplierId", "CategoryId", "QuantityPerUnit", "UnitPrice", "UnitsInStock", "UnitsOnOrder", "ReorderLevel", "Discontinued")] Products product)
+        {
+            //check consistency of URL id
+            if (id != product.ProductId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    db.Update(product);
+                    await db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    //check, does such Product not exists
+                    if (! await IsProductExists(product.ProductId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewData["SupplierId"] = new SelectList(await db.Suppliers.ToListAsync(), "SupplierId", "CompanyName", product.SupplierId);
+            ViewData["CategoryId"] = new SelectList(await db.Categories.ToListAsync(), "CategoryId", "CategoryName", product.CategoryId);
+            return View(product);
+        }
+
+
+        private async Task<bool> IsProductExists(int id)
+        {
+            return await db.Products.AnyAsync(p => p.ProductId == id);
+        }
     }
 }
