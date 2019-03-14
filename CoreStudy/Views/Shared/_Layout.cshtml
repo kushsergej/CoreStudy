@@ -1,5 +1,7 @@
 ﻿<!DOCTYPE html>
+
 <html>
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,25 +18,28 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 </head>
+
 <body>
+    <!-- navigation bar with "hamburger" button -->
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
+
+            <!-- Logo -->
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                <button typeof="button" class="navbar-toggler" data-toggle="collapse" data-target="#hamburger">
+                    <span class="glyphicon glyphicon-menu-hamburger"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">CoreStudy</a>
             </div>
-            <div class="navbar-collapse collapse">
+
+            <!-- Menu items -->
+            <div class="collapse" id="hamburger">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-                </ul>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Index"> Home </a></li>
+                    <li><a asp-area="" asp-controller="Categories" asp-action="Index"> Categories </a></li>
+                    <li><a asp-area="" asp-controller="Products" asp-action="Index"> Products </a></li>
+                 </ul>
             </div>
+
         </div>
     </nav>
 
@@ -71,4 +76,5 @@
 
     @RenderSection("Scripts", required: false)
 </body>
+
 </html>
