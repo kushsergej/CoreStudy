@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreStudy.Services.Implementations;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +20,13 @@ namespace CoreStudy
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureLogging((configs, logging) =>
+                    {
+                        logging.AddConfiguration(configs.Configuration.GetSection("Logging"));
+                        logging.AddConsole();
+                        logging.AddDebug();
+                        logging.AddProvider(new FileLoggerProvider(Path.Combine(Directory.GetCurrentDirectory(), configs.Configuration["LogFilePath"])));
+                    });
     }
 }

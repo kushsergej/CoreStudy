@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Folder Include="DB_inititial_script\" />
+    <Folder Include="Services\Interfaces\" />
   </ItemGroup>
 
 </Project>

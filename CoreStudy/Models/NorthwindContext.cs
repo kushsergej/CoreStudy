@@ -17,9 +17,9 @@ namespace CoreStudy.Models
         {
         }
 
-        public NorthwindContext(DbContextOptions<NorthwindContext> options, IConfiguration _configuration): base(options)
+        public NorthwindContext(DbContextOptions<NorthwindContext> options, IConfiguration configuration): base(options)
         {
-            configuration = _configuration;
+            this.configuration = configuration;
         }
         #endregion
 

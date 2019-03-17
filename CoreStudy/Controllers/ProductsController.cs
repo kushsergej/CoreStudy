@@ -16,10 +16,10 @@ namespace CoreStudy.Controllers
         private readonly NorthwindContext db;
         private readonly IConfiguration configuration;
 
-        public ProductsController(NorthwindContext context, IConfiguration configs)
+        public ProductsController(NorthwindContext context, IConfiguration configuration)
         {
             db = context;
-            configuration = configs;
+            this.configuration = configuration;
         }
         #endregion
 
