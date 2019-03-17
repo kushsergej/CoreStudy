@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CoreStudy.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace CoreStudy.Controllers
 {
@@ -15,7 +16,7 @@ namespace CoreStudy.Controllers
         #region DI
         private readonly NorthwindContext db;
         private readonly IConfiguration configuration;
-
+        
         public ProductsController(NorthwindContext context, IConfiguration configuration)
         {
             db = context;

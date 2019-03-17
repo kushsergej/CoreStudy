@@ -20,13 +20,11 @@ namespace CoreStudy
     public class Startup
     {
         #region DI
-        public IConfiguration Configuration { get; }
-        private readonly ILogger logger;
-
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        private readonly IConfiguration configuration;
+        
+        public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
-            this.logger = logger;
+            this.configuration = configuration;
         }
         #endregion
 
@@ -45,15 +43,30 @@ namespace CoreStudy
 
             services.AddDbContext<NorthwindContext>(options => 
             {
-                options.UseSqlServer(Configuration.GetConnectionString("NorthwindDatabase"));
+                options.UseSqlServer(configuration.GetConnectionString("NorthwindDatabase"));
             });
 
+
             //Module 1. Task 5 (logging)
+            ILoggerProvider LogFileProvider = new FileLoggerProvider(Path.Combine(Directory.GetCurrentDirectory(), configuration["LogFilePath"]));
+
+            //add FileLoggerProvider to services (will be avaialable inside Configure method)
+            services.AddLogging(configure =>
+            {
+                configure.AddConfiguration(configuration.GetSection("Logging"));
+                configure.ClearProviders();
+                configure.AddConsole();
+                configure.AddDebug();
+                configure.AddProvider(LogFileProvider);
+            });
+
+            //write logs from ConfigureServices directly
+            var logger = LogFileProvider.CreateLogger("Startup");
             logger.LogInformation($"");
             logger.LogInformation($"    Start application       >>>     {DateTime.Now}");
             logger.LogInformation($"    Application location    >>>     {Directory.GetCurrentDirectory()}");
             logger.LogInformation($"    Read configuration (current configuration values):");
-            logger.LogInformation(GetConfigSectionValue(Configuration));
+            logger.LogInformation(GetConfigSectionValue(configuration));
         }
 
 
