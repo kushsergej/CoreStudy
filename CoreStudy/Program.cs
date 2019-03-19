@@ -20,6 +20,18 @@ namespace CoreStudy
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureLogging((hostingContext, logging) => 
+                {
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                    logging.AddDebug();
+                    //adds logging in file
+                    logging.AddProvider(new FileLoggerProvider(
+                        Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            hostingContext.Configuration["LogFilePath"])
+                        ));
+                });
     }
 }

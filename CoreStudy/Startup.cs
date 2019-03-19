@@ -14,6 +14,7 @@ using CoreStudy.Models;
 using Microsoft.Extensions.Logging;
 using CoreStudy.Services.Implementations;
 using System.IO;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace CoreStudy
 {
@@ -21,10 +22,12 @@ namespace CoreStudy
     {
         #region DI
         private readonly IConfiguration configuration;
+        private readonly ILogger logger;
         
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             this.configuration = configuration;
+            this.logger = logger;
         }
         #endregion
 
@@ -48,20 +51,6 @@ namespace CoreStudy
 
 
             //Module 1. Task 5 (logging)
-            ILoggerProvider LogFileProvider = new FileLoggerProvider(Path.Combine(Directory.GetCurrentDirectory(), configuration["LogFilePath"]));
-
-            //add FileLoggerProvider to services (will be avaialable inside Configure method)
-            services.AddLogging(configure =>
-            {
-                configure.AddConfiguration(configuration.GetSection("Logging"));
-                configure.ClearProviders();
-                configure.AddConsole();
-                configure.AddDebug();
-                configure.AddProvider(LogFileProvider);
-            });
-
-            //write logs from ConfigureServices directly
-            var logger = LogFileProvider.CreateLogger("Startup");
             logger.LogInformation($"");
             logger.LogInformation($"    Start application       >>>     {DateTime.Now}");
             logger.LogInformation($"    Application location    >>>     {Directory.GetCurrentDirectory()}");
@@ -73,15 +62,43 @@ namespace CoreStudy
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            env.EnvironmentName = EnvironmentName.Production;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                //custom error handler
+                app.UseExceptionHandler(errorApp =>
+                {
+                    //adds a terminal middleware delegate to the app's request pipeline
+                    errorApp.Run(async context =>
+                    {
+                        IExceptionHandlerPathFeature error = context.Features.Get<IExceptionHandlerPathFeature>();
+                        string path = error?.Path;
+                        Exception stacktrace = error?.Error;
+
+                        context.Response.StatusCode = 500;
+                        context.Response.ContentType = $"text/html";
+                        await context.Response.WriteAsync($"<html> <body>");
+                        await context.Response.WriteAsync($"<h1> ERROR! </h1>");
+                        await context.Response.WriteAsync($"<p> Exception has been raised on {context.Request.Host}{path} </p> <hr />");
+                        await context.Response.WriteAsync($"<p> {stacktrace} </p> <hr />");
+                        await context.Response.WriteAsync($"</body> </html>");
+
+                        logger.LogInformation($"  >>> Exception has been raised on {context.Request.Host}{path}.");
+                        logger.LogInformation($"  >>> {stacktrace}");
+                    });
+                });
                 app.UseHsts();
             }
+            app.Run(async (context) =>
+            {
+                int x = 0;
+                int y = 8 / x;
+                await context.Response.WriteAsync($"Result = {y}");
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
