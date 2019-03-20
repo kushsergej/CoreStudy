@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using CoreStudy.Services.Implementations;
 using System.IO;
 using Microsoft.AspNetCore.Diagnostics;
+using CoreStudy.Services.Interfaces;
 
 namespace CoreStudy
 {
@@ -22,12 +23,10 @@ namespace CoreStudy
     {
         #region DI
         private readonly IConfiguration configuration;
-        private readonly ILogger logger;
         
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        public Startup(IConfiguration configuration)
         {
             this.configuration = configuration;
-            this.logger = logger;
         }
         #endregion
 
@@ -44,25 +43,33 @@ namespace CoreStudy
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            #region Custom Services registration
             services.AddDbContext<NorthwindContext>(options => 
             {
                 options.UseSqlServer(configuration.GetConnectionString("NorthwindDatabase"));
             });
 
-
-            //Module 1. Task 5 (logging)
-            logger.LogInformation($"");
-            logger.LogInformation($"    Start application       >>>     {DateTime.Now}");
-            logger.LogInformation($"    Application location    >>>     {Directory.GetCurrentDirectory()}");
-            logger.LogInformation($"    Read configuration (current configuration values):");
-            logger.LogInformation(GetConfigSectionValue(configuration));
+            services.AddScoped<IGetFileLoggerProvider, GetFileLoggerProvider>();
+            #endregion
         }
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory  loggerFactory, IGetFileLoggerProvider fileLoggerProvider)
         {
-            env.EnvironmentName = EnvironmentName.Production;
+            loggerFactory.AddProvider(fileLoggerProvider.GetProvider(configuration["LogFilePath"]));
+            ILogger logger = loggerFactory.CreateLogger<Startup>();
+
+            #region App start logging
+            logger.LogInformation($"");
+            logger.LogInformation($"    Start application");
+            logger.LogInformation($"    Application location    >>>     {Directory.GetCurrentDirectory()}");
+            logger.LogInformation($"    Read configuration (current configuration values)   >>>     see below:");
+            logger.LogInformation(GetConfigSectionValue(configuration));
+            #endregion
+
+            //env.EnvironmentName = EnvironmentName.Production;
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -93,12 +100,15 @@ namespace CoreStudy
                 });
                 app.UseHsts();
             }
-            app.Run(async (context) =>
-            {
-                int x = 0;
-                int y = 8 / x;
-                await context.Response.WriteAsync($"Result = {y}");
-            });
+
+            #region Non-develop exception imitation
+            //app.Run(async (context) =>
+            //{
+            //    int x = 0;
+            //    int y = 8 / x;
+            //    await context.Response.WriteAsync($"Result = {y}");
+            //});
+            #endregion
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

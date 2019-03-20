@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CoreStudy.Models;
+using Microsoft.Extensions.Logging;
 
 namespace CoreStudy.Controllers
 {
@@ -13,7 +14,7 @@ namespace CoreStudy.Controllers
     {
         #region DI
         private readonly NorthwindContext db;
-
+        
         public CategoriesController(NorthwindContext context)
         {
             db = context;

@@ -40,7 +40,7 @@ namespace CoreStudy.Services.Implementations
                 //block below code scope for only one current thread (to prevent concurrency from parallel threads)
                 lock (locker)
                 {
-                    File.AppendAllText(filePath, formatter(state, exception) + Environment.NewLine);
+                    File.AppendAllText(filePath, $"{DateTime.Now}:  {formatter(state, exception) + Environment.NewLine}");
                 }
             }
         }
