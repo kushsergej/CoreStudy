@@ -69,7 +69,6 @@ namespace CoreStudy
             #endregion
 
             //env.EnvironmentName = EnvironmentName.Production;
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -90,18 +89,18 @@ namespace CoreStudy
                         context.Response.ContentType = $"text/html";
                         await context.Response.WriteAsync($"<html> <body>");
                         await context.Response.WriteAsync($"<h1> ERROR! </h1>");
-                        await context.Response.WriteAsync($"<p> Exception has been raised on {context.Request.Host}{path} </p> <hr />");
+                        await context.Response.WriteAsync($"<p>{DateTime.Now}:  Exception has been raised on {path} </p> <hr />");
                         await context.Response.WriteAsync($"<p> {stacktrace} </p> <hr />");
                         await context.Response.WriteAsync($"</body> </html>");
 
-                        logger.LogInformation($"  >>> Exception has been raised on {context.Request.Host}{path}.");
-                        logger.LogInformation($"  >>> {stacktrace}");
+                        logger.LogInformation($"Exception has been raised on {path}.");
+                        logger.LogInformation($"{stacktrace}");
                     });
                 });
                 app.UseHsts();
             }
 
-            #region Non-develop exception imitation
+            #region Exception imitation
             //app.Run(async (context) =>
             //{
             //    int x = 0;
