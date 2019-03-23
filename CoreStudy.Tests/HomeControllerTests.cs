@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace CoreStudy.Tests
@@ -10,16 +11,17 @@ namespace CoreStudy.Tests
     public class HomeControllerTests
     {
         [Fact]
-        public void IndexViewResultIsNotNull()
+        public async Task IndexTest()
         {
             //Arrange
-            var controller = new HomeController();
+            HomeController controller = new HomeController();
 
             //Act
-            var result = controller.Index();
+            ViewResult result = await controller.Index() as ViewResult;
 
             //Assert
             Assert.NotNull(result);
+            var viewResult = Assert.IsType<ViewResult>(result);
         }
     }
 }
