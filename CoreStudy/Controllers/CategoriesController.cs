@@ -26,7 +26,7 @@ namespace CoreStudy.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await db.Categories.ToListAsync());
+            return View(await Task.FromResult(db.Categories.ToList()));
         }
     }
 }

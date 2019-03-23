@@ -35,6 +35,7 @@ namespace CoreStudy.Tests
             contextMock
                 .Setup(context => context.Categories)
                 .Returns(categoriesMock.Object);
+
             var controller = new CategoriesController(contextMock.Object);
 
             //Act
@@ -44,7 +45,7 @@ namespace CoreStudy.Tests
             Assert.NotNull(result);
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<IEnumerable<Categories>>(viewResult.Model);
-            Assert.Equal(3, model.Count());
+            Assert.Equal(categoriesList.Count(), model.Count());
         }
     }
 }

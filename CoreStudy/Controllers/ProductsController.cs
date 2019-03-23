@@ -44,7 +44,7 @@ namespace CoreStudy.Controllers
                 allProducts = allProducts.Take(Math.Abs(m));
             }
 
-            return View(await allProducts.ToListAsync());
+            return View(await Task.FromResult(allProducts.ToList()));
         }
 
 
