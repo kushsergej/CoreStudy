@@ -28,5 +28,25 @@ namespace CoreStudy.Controllers
         {
             return View(await Task.FromResult(db.Categories.ToList()));
         }
+
+
+        // GET: Categories/GetPictureById/2
+        [HttpGet]
+        public async Task<IActionResult> GetPictureById(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Categories categoryItem = await db.Categories.FindAsync(id);
+
+            if (categoryItem == null)
+            {
+                return NotFound();
+            }
+
+            return View(categoryItem);
+        }
     }
 }
