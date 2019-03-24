@@ -61,7 +61,7 @@ namespace CoreStudy
             ILogger logger = loggerFactory.CreateLogger<Startup>();
 
             #region App start logging
-            logger.LogInformation($"");
+            logger.LogInformation($"    >>>>>>>>>>>>>>>>>");
             logger.LogInformation($"    Start application");
             logger.LogInformation($"    Application location    >>>     {Directory.GetCurrentDirectory()}");
             logger.LogInformation($"    Read configuration (current configuration values)   >>>     see below:");

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CoreStudy.Models;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace CoreStudy.Controllers
 {
@@ -46,7 +48,52 @@ namespace CoreStudy.Controllers
                 return NotFound();
             }
 
-            return View(categoryItem);
+            //skip first 78 garbage bytes
+            byte[] img = categoryItem.Picture.Skip(78).ToArray();
+            ViewBag.categoryId = id;
+
+            return View(img);
+        }
+
+
+        //POST: Categories/UploadFile/2
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadFile(int? categoryId, IFormFile uploadImage)
+        {
+            if (categoryId == null)
+            {
+                return NotFound();
+            }
+
+            Categories categoryItem = await db.Categories.FindAsync(categoryId);
+
+            if (categoryItem == null)
+            {
+                return NotFound();
+            }
+
+            if (uploadImage == null)
+            {
+                return BadRequest();
+            }
+
+            //read uploadFile to byte[]
+            byte[] pic = null;
+            using (BinaryReader reader = new BinaryReader(uploadImage.OpenReadStream()))
+            {
+                pic = reader.ReadBytes((int) uploadImage.Length);
+            }
+
+            //add first 78 garbage bytes
+            byte[] trashedPic = new byte[pic.Length + 78];
+            pic.CopyTo(trashedPic, 78);
+
+            categoryItem.Picture = trashedPic;
+            db.Update(categoryItem);
+            await db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(GetPictureById), new { id = categoryId });
         }
     }
 }

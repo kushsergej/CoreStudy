@@ -1,41 +1,29 @@
-﻿@model CoreStudy.Models.Categories
+﻿@model byte[]
 
 @{
-    ViewData["Title"] = "GetPictureById";
+    ViewData["Title"] = "CategoryPicture";
 }
 
-<h2>GetPictureById</h2>
+<h2> Category Picture </h2>
 
 <div>
-    <h4>Categories</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.CategoryName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CategoryName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Picture)
-        </dt>
-        <dd>
-            @{
-                //skip first 78 trash bytes
-                byte[] data = Model.Picture.Skip(78).ToArray<byte>();
-                string imgDataURL = string.Format($"data: image/bmp; base64, {Convert.ToBase64String(data)}");
-            }
-            @Html.Raw($"<img style='width:240px; height:240px;' src=\"{imgDataURL}\" />")
-        </dd>
-    </dl>
+    @{
+        string imgConverted = string.Format($"data: image/bmp; base64, {Convert.ToBase64String(Model)}"); 
+    }
+
+    @Html.Raw($"<img style='width:200px; height:200px;' src=\"{imgConverted}\" />")
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.CategoryId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<hr />
+<form method="post" enctype="multipart/form-data" asp-controller="Categories" asp-action="UploadFile">
+
+    <div class="form-group">
+        <p> Upload new file using this form: </p>
+        <input type="hidden" name="categoryId" value="@ViewBag.categoryId" />
+        <input type="file" name="uploadImage" />
+    </div>
+
+    <div class="form-group">
+        <input type="submit" name="submit" value="Upload" />
+    </div>
+</form>
