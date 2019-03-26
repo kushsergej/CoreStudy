@@ -16,6 +16,7 @@ using CoreStudy.Services.Implementations;
 using System.IO;
 using Microsoft.AspNetCore.Diagnostics;
 using CoreStudy.Services.Interfaces;
+using Microsoft.AspNetCore.Routing.Constraints;
 
 namespace CoreStudy
 {
@@ -48,6 +49,8 @@ namespace CoreStudy
             {
                 options.UseSqlServer(configuration.GetConnectionString("NorthwindDatabase"));
             });
+
+            services.AddRouting();
 
             services.AddScoped<IGetFileLoggerProvider, GetFileLoggerProvider>();
             #endregion
@@ -115,6 +118,11 @@ namespace CoreStudy
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: "images",
+                    template: "images/{id:required:int:range(1,8)}",
+                    defaults: new { controller = "Categories", action = "GetPictureById" });
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
