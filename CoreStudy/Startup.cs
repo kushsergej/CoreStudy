@@ -17,6 +17,7 @@ using System.IO;
 using Microsoft.AspNetCore.Diagnostics;
 using CoreStudy.Services.Interfaces;
 using Microsoft.AspNetCore.Routing.Constraints;
+using CoreStudy.Middleware;
 
 namespace CoreStudy
 {
@@ -53,23 +54,17 @@ namespace CoreStudy
             services.AddRouting();
 
             services.AddScoped<IGetFileLoggerProvider, GetFileLoggerProvider>();
+            services.AddScoped<IAppStartLogger, AppStartLogger>();
             #endregion
         }
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory  loggerFactory, IGetFileLoggerProvider fileLoggerProvider)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory  loggerFactory, IGetFileLoggerProvider fileLoggerProvider, IAppStartLogger appStartLogger)
         {
             loggerFactory.AddProvider(fileLoggerProvider.GetProvider(configuration["LogFilePath"]));
             ILogger logger = loggerFactory.CreateLogger<Startup>();
-
-            #region App start logging
-            logger.LogInformation($"    >>>>>>>>>>>>>>>>>");
-            logger.LogInformation($"    Start application");
-            logger.LogInformation($"    Application location    >>>     {Directory.GetCurrentDirectory()}");
-            logger.LogInformation($"    Read configuration (current configuration values)   >>>     see below:");
-            logger.LogInformation(GetConfigSectionValue(configuration));
-            #endregion
+            appStartLogger.Log();
 
             //env.EnvironmentName = EnvironmentName.Production;
             if (env.IsDevelopment())
@@ -102,16 +97,8 @@ namespace CoreStudy
                 });
                 app.UseHsts();
             }
-
-            #region Exception imitation
-            //app.Run(async (context) =>
-            //{
-            //    int x = 0;
-            //    int y = 8 / x;
-            //    await context.Response.WriteAsync($"Result = {y}");
-            //});
-            #endregion
-
+            //app.UseMiddleware<ExceptionImitationMiddleware>();
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -127,30 +114,6 @@ namespace CoreStudy
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-        }
-
-
-        //recursive function for getting config settings
-        private string GetConfigSectionValue(IConfiguration configuration)
-        {
-            string result = "";
-
-            foreach (var section in configuration.GetChildren())
-            {
-                result += "\"" + section.Key + "\" : ";
-
-                if (section.Value != null)
-                {
-                    result += "\"" + section.Value + "\",\n";
-                }
-                else
-                {
-                    string subSection = GetConfigSectionValue(section);
-                    result += "{\n" + subSection + "},\n";
-                }
-            }
-
-            return result;
         }
     }
 }
