@@ -62,9 +62,11 @@ namespace CoreStudy
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory  loggerFactory, IGetFileLoggerProvider fileLoggerProvider, IAppStartLogger appStartLogger)
         {
+            #region Log Application start
             loggerFactory.AddProvider(fileLoggerProvider.GetProvider(configuration["LogFilePath"]));
             ILogger logger = loggerFactory.CreateLogger<Startup>();
             appStartLogger.Log();
+            #endregion
 
             //env.EnvironmentName = EnvironmentName.Production;
             if (env.IsDevelopment())
