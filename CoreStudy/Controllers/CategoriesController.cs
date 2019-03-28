@@ -9,6 +9,7 @@ using CoreStudy.Models;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace CoreStudy.Controllers
 {
@@ -16,10 +17,12 @@ namespace CoreStudy.Controllers
     {
         #region DI
         private readonly NorthwindContext db;
+        private readonly IConfiguration configuration;
         
-        public CategoriesController(NorthwindContext context)
+        public CategoriesController(NorthwindContext context, IConfiguration configuration)
         {
             db = context;
+            this.configuration = configuration;
         }
         #endregion
 
@@ -41,16 +44,29 @@ namespace CoreStudy.Controllers
                 return NotFound();
             }
 
-            Categories categoryItem = await db.Categories.FindAsync(id);
+            byte[] img = null;
 
-            if (categoryItem == null)
+            //check, does requested file already exists in a locally cache
+            string checkingFile = Path.Combine(Directory.GetCurrentDirectory(), configuration["Caching:CacheFolderPath"], $"{id}.bmp");
+            if (System.IO.File.Exists(checkingFile))
             {
-                return NotFound();
+                //skip first 78 garbage bytes
+                img = (await System.IO.File.ReadAllBytesAsync(checkingFile))
+                    .Skip(78).ToArray();
+            }
+            else
+            {
+                Categories categoryItem = await db.Categories.FindAsync(id);
+
+                if (categoryItem == null)
+                {
+                    return NotFound();
+                }
+
+                //skip first 78 garbage bytes
+                img = categoryItem.Picture.Skip(78).ToArray();
             }
 
-            
-            //skip first 78 garbage bytes
-            byte[] img = categoryItem.Picture.Skip(78).ToArray();
             ViewBag.categoryId = id;
 
             Response.ContentType = "application/octet-stream";
