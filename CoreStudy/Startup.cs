@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using CoreStudy.Services.Interfaces;
 using Microsoft.AspNetCore.Routing.Constraints;
 using CoreStudy.Middleware;
+using CoreStudy.Filters;
 
 namespace CoreStudy
 {
@@ -43,7 +44,9 @@ namespace CoreStudy
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //set up global filter
+            services.AddMvc(options => options.Filters.Add<ActionLoggerFilter>())
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             #region Custom Services registration
             services.AddDbContext<NorthwindContext>(options => 

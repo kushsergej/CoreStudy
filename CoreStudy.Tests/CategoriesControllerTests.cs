@@ -2,6 +2,7 @@
 using CoreStudy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -36,8 +37,10 @@ namespace CoreStudy.Tests
                 .Setup(context => context.Categories)
                 .Returns(categoriesMock.Object);
 
-            var controller = new CategoriesController(contextMock.Object);
-
+            var configMock = new Mock<IConfiguration>();
+            
+            var controller = new CategoriesController(contextMock.Object, configMock.Object);
+            
             //Act
             ViewResult result = await controller.Index() as ViewResult;
 
