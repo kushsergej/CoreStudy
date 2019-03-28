@@ -48,9 +48,13 @@ namespace CoreStudy.Controllers
                 return NotFound();
             }
 
+            
             //skip first 78 garbage bytes
             byte[] img = categoryItem.Picture.Skip(78).ToArray();
             ViewBag.categoryId = id;
+
+            Response.ContentType = "application/octet-stream";
+            Response.Headers.Add("image_id", id.ToString());
 
             return View(img);
         }

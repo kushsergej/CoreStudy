@@ -105,6 +105,8 @@ namespace CoreStudy
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseMiddleware<ImageCachingMiddleware>();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

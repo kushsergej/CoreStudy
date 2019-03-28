@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Folder Include="DB_inititial_script\" />
+    <Folder Include="ImagesCache\" />
   </ItemGroup>
 
 </Project>
