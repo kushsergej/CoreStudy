@@ -13,6 +13,7 @@
   <ItemGroup>
     <Folder Include="DB_inititial_script\" />
     <Folder Include="ImagesCache\" />
+    <Folder Include="ImagesCache\" />
   </ItemGroup>
 
 </Project>
