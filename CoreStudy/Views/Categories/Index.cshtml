@@ -1,4 +1,6 @@
-﻿@model IEnumerable<CoreStudy.Models.Categories>
+﻿@using CoreStudy.Helpers
+
+@model IEnumerable<CoreStudy.Models.Categories>
 
 @{
     ViewData["Title"] = "Index";
@@ -34,7 +36,10 @@
                 </td>
 
                 <td>
-                    <a asp-controller="Categories" asp-action="GetPictureById" asp-route-id="@item.CategoryId"> Image </a>
+                    <!--
+                        <a asp-controller="Categories" asp-action="GetPictureById" asp-route-id="@item.CategoryId"> Image </a>
+                    -->
+                    @Html.NorthwindImageLink(item.CategoryId, "Image")
                 </td>
             </tr>
         }
