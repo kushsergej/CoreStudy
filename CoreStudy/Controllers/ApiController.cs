@@ -24,14 +24,14 @@ namespace CoreStudy.Controllers
 
         // GET: <site_root>/api
         [HttpGet]
-        public async Task<JsonResult> Get()
+        public async Task<IActionResult> Get()
         {
             var categories = db.Categories.Select(p => new
             {
                 id = p.CategoryId,
                 name = p.CategoryName,
                 p.Description
-            });
+            }).ToArray();
 
             var products = db.Products.Select(p => new
             {
@@ -45,9 +45,9 @@ namespace CoreStudy.Controllers
                 p.Discontinued,
                 p.Category.CategoryName,
                 p.Supplier.CompanyName
-            });
+            }).ToArray();
 
-            return await Task.FromResult(Json(new {categories, products}));
+            return await Task.FromResult(Json(new { categories, products}));
         }
     }
 }
