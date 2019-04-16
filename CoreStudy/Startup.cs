@@ -113,11 +113,6 @@ namespace CoreStudy
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "api",
-                    template: "api",
-                    defaults: new { controller = "Api", action = "Get"});
-
-                routes.MapRoute(
                     name: "images",
                     template: "images/{id:required:int:range(1,8)}",
                     defaults: new { controller = "Categories", action = "GetPictureById" });
