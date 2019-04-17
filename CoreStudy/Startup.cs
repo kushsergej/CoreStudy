@@ -54,7 +54,27 @@ namespace CoreStudy
                 options.UseSqlServer(configuration.GetConnectionString("NorthwindDatabase"));
             });
 
+
             services.AddRouting();
+            services.AddSwaggerDocument(config => 
+            {
+                config.PostProcess = document =>
+                {
+                    document.Info.Version = "v1";
+                    document.Info.Title = "CoreStudy API";
+                    document.Info.Description = "A study ASP.NET Core web API";
+                    document.Info.TermsOfService = "None";
+                    document.Info.Contact = new NSwag.SwaggerContact
+                    {
+                        Name = "Siarhei Kushniaruk",
+                        Email = "Siarhei_Kushniaruk@epam.com"
+                    };
+                    document.Info.License = new NSwag.SwaggerLicense
+                    {
+                        Name = "Use under LICX"
+                    };
+                };
+            });
 
             services.AddScoped<IGetFileLoggerProvider, GetFileLoggerProvider>();
             services.AddScoped<IAppStartLogger, AppStartLogger>();
@@ -109,6 +129,8 @@ namespace CoreStudy
             app.UseCookiePolicy();
 
             app.UseMiddleware<ImageCachingMiddleware>();
+            app.UseSwagger();
+            app.UseSwaggerUi3();
 
             app.UseMvc(routes =>
             {
