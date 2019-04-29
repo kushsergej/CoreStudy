@@ -19,6 +19,7 @@ using CoreStudy.Services.Interfaces;
 using Microsoft.AspNetCore.Routing.Constraints;
 using CoreStudy.Middleware;
 using CoreStudy.Filters;
+using Microsoft.AspNetCore.Identity;
 
 namespace CoreStudy
 {
@@ -53,8 +54,11 @@ namespace CoreStudy
             {
                 options.UseSqlServer(configuration.GetConnectionString("NorthwindDatabase"));
             });
-
-
+            services.AddDbContext<ApplicationIdentityContext>(options => 
+            {
+                options.UseSqlServer(configuration.GetConnectionString("IdentityDatabase"));
+            });
+            
             services.AddRouting();
             services.AddSwaggerDocument(config => 
             {
@@ -75,6 +79,15 @@ namespace CoreStudy
                     };
                 };
             });
+
+            services.AddIdentity<IdentityUser, IdentityRole>(options => 
+            {
+                options.Password.RequiredLength = 4;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+            }).
+            AddEntityFrameworkStores<ApplicationIdentityContext>();
 
             services.AddScoped<IGetFileLoggerProvider, GetFileLoggerProvider>();
             services.AddScoped<IAppStartLogger, AppStartLogger>();
@@ -128,6 +141,7 @@ namespace CoreStudy
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseAuthentication();
             app.UseMiddleware<ImageCachingMiddleware>();
             app.UseSwagger();
             app.UseSwaggerUi3();
