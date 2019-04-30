@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CoreStudy.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace CoreStudy.Controllers
 {
@@ -57,6 +58,48 @@ namespace CoreStudy.Controllers
             }
 
             return View(model);
+        }
+
+
+        // GET: Account/Login
+        [HttpGet]
+        public async Task<IActionResult> Login()
+        {
+            return View();
+        }
+
+
+        // POST: Account/Login
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login([Bind("Email", "Password", "RememberMe")] LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                SignInResult result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: model.RememberMe, lockoutOnFailure: false);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    ModelState.AddModelError(String.Empty, "Invalid Login/Password");
+                }
+            }
+
+            return View(model);
+        }
+
+
+        // GET: Account/LogOff
+        [HttpGet]
+        public async Task<IActionResult> LogOff()
+        {
+            //clear authentication cookies for current IdentityUser
+            await signInManager.SignOutAsync();
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

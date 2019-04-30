@@ -82,6 +82,7 @@ namespace CoreStudy
 
             services.AddIdentity<IdentityUser, IdentityRole>(options => 
             {
+                options.User.RequireUniqueEmail = true;
                 options.Password.RequiredLength = 4;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireLowercase = false;
