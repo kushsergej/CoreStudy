@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using CoreStudy.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreStudy.Controllers
 {
+    [Authorize]
     public class ProductsController : Controller
     {
         #region DI

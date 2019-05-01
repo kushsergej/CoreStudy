@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CoreStudy.Models;
+using CoreStudy.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -14,11 +15,13 @@ namespace CoreStudy.Controllers
         #region DI
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly IEmailSender emailSender;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IEmailSender emailSender)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.emailSender = emailSender;
         }
         #endregion
 
@@ -100,6 +103,42 @@ namespace CoreStudy.Controllers
             await signInManager.SignOutAsync();
 
             return RedirectToAction("Index", "Home");
+        }
+
+
+        // GET: Account/ForgetPassword
+        [HttpGet]
+        public async Task<IActionResult> ForgetPassword()
+        {
+            return View();
+        }
+
+
+        // POST: Account/ForgetPassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgetPassword([Bind("Email")] ForgetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                IdentityUser user = await userManager.FindByNameAsync(model.Email);
+
+                if (user != null)
+                {
+                    string token = await userManager.GeneratePasswordResetTokenAsync(user);
+                    string callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token = token }, protocol: HttpContext.Request.Scheme);
+
+                    await emailSender.SendAsync(model.Email, "Reset password", $"Link to {callbackUrl}");
+
+                    return View();
+                }
+                else
+                {
+                    ModelState.AddModelError(String.Empty, "There is no User with such email");
+                }
+            }
+
+            return View(model);
         }
     }
 }

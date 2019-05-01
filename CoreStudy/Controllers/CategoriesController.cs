@@ -10,9 +10,11 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreStudy.Controllers
 {
+    [Authorize]
     public class CategoriesController : Controller
     {
         #region DI

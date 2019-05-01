@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CoreStudy.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         // GET: Home/Index/

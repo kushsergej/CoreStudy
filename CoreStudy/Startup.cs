@@ -88,10 +88,12 @@ namespace CoreStudy
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
             }).
-            AddEntityFrameworkStores<ApplicationIdentityContext>();
+            AddEntityFrameworkStores<ApplicationIdentityContext>().
+            AddDefaultTokenProviders();
 
             services.AddScoped<IGetFileLoggerProvider, GetFileLoggerProvider>();
             services.AddScoped<IAppStartLogger, AppStartLogger>();
+            services.AddScoped<IEmailSender, EmailSender>();
             #endregion
         }
 
