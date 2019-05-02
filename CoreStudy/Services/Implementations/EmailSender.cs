@@ -23,9 +23,13 @@ namespace CoreStudy.Services.Implementations
 
         public async Task SendAsync(string userEmail, string Subject, string MessageText)
         {
+            string address = configuration["Email:address"];
+            string login = configuration["Email:login"];
+            string psw = configuration["Email:password"];
+
             MimeMessage emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress("CoreStudy app", "kushsergej@yandex.by"));
+            emailMessage.From.Add(new MailboxAddress("CoreStudy app", address));
             emailMessage.To.Add(new MailboxAddress("", userEmail));
             emailMessage.Subject = Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = MessageText };
@@ -33,7 +37,7 @@ namespace CoreStudy.Services.Implementations
             using (SmtpClient client = new SmtpClient())
             {
                 await client.ConnectAsync(host: "smtp.yandex.ru", port: 465, useSsl: true);
-                await client.AuthenticateAsync(userName: configuration["Email:login"], password: configuration["Email:password"]);
+                await client.AuthenticateAsync(userName: login, password: psw);
                 await client.SendAsync(emailMessage);
                 await client.DisconnectAsync(quit: true);
             }

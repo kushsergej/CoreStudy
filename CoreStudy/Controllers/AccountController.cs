@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CoreStudy.Models;
 using CoreStudy.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -123,18 +124,67 @@ namespace CoreStudy.Controllers
             {
                 IdentityUser user = await userManager.FindByNameAsync(model.Email);
 
+                //we have such user in Identity DB
                 if (user != null)
                 {
                     string token = await userManager.GeneratePasswordResetTokenAsync(user);
-                    string callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token = token }, protocol: HttpContext.Request.Scheme);
+                    string callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token = token, email = model.Email }, protocol: HttpContext.Request.Scheme);
 
-                    await emailSender.SendAsync(model.Email, "Reset password", $"Link to {callbackUrl}");
+                    await emailSender.SendAsync(model.Email, "Reset password", $"Link to {callbackUrl}. Sent on {DateTime.Now}");
 
-                    return View();
+                    ViewBag.Address = model.Email;
+                    return View("ForgetPasswordInforming");
                 }
                 else
                 {
-                    ModelState.AddModelError(String.Empty, "There is no User with such email");
+                    ModelState.AddModelError(String.Empty, "There is no such email in a system");
+                }
+            }
+
+            return View(model);
+        }
+
+
+        // GET: Account/ResetPassword
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword(string token = null, string email = null)
+        {
+            if (token == null || email == null)
+            {
+                return BadRequest();
+            }
+
+            return View();
+        }
+
+
+        // POST: Account/ResetPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword([Bind("Email", "Password", "ConfirmPassword", "Token")] ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                IdentityUser user = await userManager.FindByNameAsync(model.Email);
+
+                //we have such user in Identity DB
+                if (user != null)
+                {
+                    IdentityResult result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+                    if (result.Succeeded)
+                    {
+                        return View("ResetPasswordInforming");
+                    }
+                    else
+                    {
+                        foreach (IdentityError err in result.Errors)
+                        {
+                            ModelState.AddModelError(String.Empty, err.Description);
+                        }
+                    }
                 }
             }
 
