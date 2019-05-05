@@ -127,8 +127,7 @@ namespace CoreStudy.Controllers
                 //we have such user in Identity DB
                 if (user != null)
                 {
-                    string token = await userManager.GeneratePasswordResetTokenAsync(user);
-                    string callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token = token, email = model.Email }, protocol: HttpContext.Request.Scheme);
+                    string callbackUrl = Url.Action("ResetPassword", "Account", new { Id = user.Id, Email = model.Email }, protocol: HttpContext.Request.Scheme);
 
                     await emailSender.SendAsync(model.Email, "Reset password", $"Link to {callbackUrl}. Sent on {DateTime.Now}");
 
@@ -137,7 +136,7 @@ namespace CoreStudy.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(String.Empty, "There is no such email in a system");
+                    ModelState.AddModelError(String.Empty, "There is no such email in a system. Register first");
                 }
             }
 
@@ -148,9 +147,9 @@ namespace CoreStudy.Controllers
         // GET: Account/ResetPassword
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword(string token = null, string email = null)
+        public async Task<IActionResult> ResetPassword(string Id = null, string Email = null)
         {
-            if (token == null || email == null)
+            if (Id == null || Email == null)
             {
                 return BadRequest();
             }
@@ -163,16 +162,16 @@ namespace CoreStudy.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword([Bind("Email", "Password", "ConfirmPassword", "Token")] ResetPasswordViewModel model)
+        public async Task<IActionResult> ResetPassword([Bind("Id", "Email", "OldPassword", "NewPassword", "ConfirmNewPassword")] ResetPasswordViewModel model)
         {
             if (ModelState.IsValid)
             {
-                IdentityUser user = await userManager.FindByNameAsync(model.Email);
+                IdentityUser user = await userManager.FindByIdAsync(model.Id);
 
                 //we have such user in Identity DB
                 if (user != null)
                 {
-                    IdentityResult result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+                    IdentityResult result = await userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
                     if (result.Succeeded)
                     {
@@ -185,6 +184,10 @@ namespace CoreStudy.Controllers
                             ModelState.AddModelError(String.Empty, err.Description);
                         }
                     }
+                }
+                else
+                {
+                    ModelState.AddModelError(String.Empty, "There is no such email in a system. Register first");
                 }
             }
 

@@ -80,7 +80,7 @@ namespace CoreStudy
                 };
             });
 
-            services.AddIdentity<IdentityUser, IdentityRole>(options => 
+            services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
                 options.User.RequireUniqueEmail = true;
                 options.Password.RequiredLength = 4;
@@ -88,8 +88,7 @@ namespace CoreStudy
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
             }).
-            AddEntityFrameworkStores<ApplicationIdentityContext>().
-            AddDefaultTokenProviders();
+            AddEntityFrameworkStores<ApplicationIdentityContext>();
 
             services.AddScoped<IGetFileLoggerProvider, GetFileLoggerProvider>();
             services.AddScoped<IAppStartLogger, AppStartLogger>();

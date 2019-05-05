@@ -9,18 +9,24 @@ namespace CoreStudy.Models
     public class ResetPasswordViewModel
     {
         [Required]
+        public string Id { get; set; }
+
+        [Required]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string OldPassword { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Check password")]
-        public string ConfirmPassword { get; set; }
+        public string NewPassword { get; set; }
 
-        public string Token { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Compare("NewPassword", ErrorMessage = "Check new password")]
+        public string ConfirmNewPassword { get; set; }
     }
 }
