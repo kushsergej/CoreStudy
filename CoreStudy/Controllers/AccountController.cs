@@ -15,22 +15,39 @@ namespace CoreStudy.Controllers
     {
         #region DI
         private readonly UserManager<IdentityUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly IEmailSender emailSender;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IEmailSender emailSender)
+        public AccountController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager, IEmailSender emailSender)
         {
             this.userManager = userManager;
+            this.roleManager = roleManager;
             this.signInManager = signInManager;
             this.emailSender = emailSender;
         }
         #endregion
 
 
+        // Get: Account
+        [HttpGet]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> Users() => View(userManager.Users.ToList());
+
         // GET: Account/Register
         [HttpGet]
         public async Task<IActionResult> Register()
         {
+            //initialize Identity DB by Roles
+            if (await roleManager.FindByNameAsync("admin") == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole("admin"));
+            }
+            if (await roleManager.FindByNameAsync("user") == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole("user"));
+            }
+
             return View();
         }
 
@@ -38,7 +55,7 @@ namespace CoreStudy.Controllers
         // POST: Account/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register([Bind("Email", "Password", "ConfirmPassword")] RegisterViewModel model)
+        public async Task<IActionResult> Register([Bind("Email", "Password", "ConfirmPassword", "UserRoles")] RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -49,6 +66,7 @@ namespace CoreStudy.Controllers
 
                 if (result.Succeeded)
                 {
+                    await userManager.AddToRolesAsync(user, model.UserRoles);
                     await signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home");
                 }

@@ -1,4 +1,7 @@
-﻿@model CoreStudy.Models.RegisterViewModel
+﻿@using Microsoft.AspNetCore.Identity
+@inject RoleManager<IdentityRole> roleManager
+
+@model CoreStudy.Models.RegisterViewModel
 
 @{
     ViewData["Title"] = "Register";
@@ -32,6 +35,17 @@
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             
+            <div>
+                <label asp-for="UserRoles" class="control-label"></label>
+                <div>
+                    @foreach (IdentityRole role in roleManager.Roles)
+                    {
+                        <input type="checkbox" name="UserRoles" value="@role.Name" /> @role.Name <br />
+                    }
+                </div>
+                <span asp-validation-for="UserRoles" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Register" class="btn btn-default" />
             </div>

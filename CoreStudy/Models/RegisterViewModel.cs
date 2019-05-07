@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,5 +21,8 @@ namespace CoreStudy.Models
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "Check password")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        public List<string> UserRoles { get; set; }
     }
 }

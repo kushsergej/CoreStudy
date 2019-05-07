@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<IdentityUser> userManager
+
+@model IEnumerable<IdentityUser>
+
+<h2> All registered Users </h2>
+<h4> Info for site admins only </h4>
+<hr />
+
+
+<ol>
+    @foreach (IdentityUser user in Model)
+    {
+        string name = user.UserName;
+        <li> User: @name ( assigned to @userManager.GetRolesAsync(user).Result.Count role(s) ) </li>
+    }
+</ol>
