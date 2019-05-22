@@ -144,7 +144,7 @@ namespace CoreStudy
             app.UseCookiePolicy();
 
             app.UseAuthentication();
-            app.UseMiddleware<ImageCachingMiddleware>();
+            //app.UseMiddleware<ImageCachingMiddleware>();
             app.UseSwagger();
             app.UseSwaggerUi3();
 
